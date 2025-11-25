@@ -42,4 +42,4 @@ def delete_entry(entry_id:int):
         if entry.id==entry_id:
             ledger.pop(index)
             return{"message":"entry deleted successfully"}
-        return{"error":"entry not found"}
+    return{"error":"entry not found"}
