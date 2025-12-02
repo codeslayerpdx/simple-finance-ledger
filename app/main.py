@@ -12,20 +12,20 @@ app=FastAPI()
 def home():
     return{"message":"Finance ledger API is running"}
 
-class LedgerEntry(BaseModel):
-    id:int
-    name:str
-    description:str
-    amount:float
-    date:date
-    category:str
-
-ledger=[]
-
 @app.post("/add")
-def add_entry(entry:LedgerEntry):
-    ledger.append(entry)
-    return{"message":"Entry added successfully"}
+def add_entry(entry: LedgerEntry, db: Session = Depends(get_db)) -> dict:
+    new_txn = Transactions(
+        name=entry.name,
+        description=entry.description,
+        amount=entry.amount,
+        date=entry.date,
+        category=entry.category,
+    )
+    db.add(new_txn)
+    db.commit()
+    db.refresh(new_txn)
+
+    return {"message": "Entry added successfully", "id": new_txn.id}
 
 @app.get("/read")
 def get_all_entries():
