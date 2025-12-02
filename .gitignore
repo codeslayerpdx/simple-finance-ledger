@@ -4,6 +4,8 @@ venv/
 .idea/
 .vscode/
 *.pyc
+ledger.db
+
 
 
 
