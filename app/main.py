@@ -1,6 +1,10 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
 from datetime import date
+
+from app.database import get_db
+from app import models
+
 
 app=FastAPI()
 
