@@ -7,3 +7,10 @@ class LedgerEntry(BaseModel):
     amount: float
     date: date
     category: str
+
+class LedgerEntryout(LedgerEntry):
+    id:int
+
+
+    class Config:
+        orm_mode=True
