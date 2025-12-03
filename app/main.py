@@ -32,13 +32,22 @@ def add_entry(entry: LedgerEntry, db: Session = Depends(get_db)) -> dict:
 def get_all_entries(db: Session = Depends(get_db)):
     return db.query(Transactions).all()
 
-@app.put("/update/{entry_id}")
-def update_entry(entry_id:int,updated_entry:LedgerEntry):
-    for index, entry in enumerate(ledger):
-        if entry.id==entry_id:
-            ledger[index]=updated_entry
-            return{"message":"entry updated successfully"}
-    return{"error":"entry not found"}
+@app.put("/entries/{entry_id}")
+def update_entry(entry_id: int, updated_entry: LedgerEntry, db: Session = Depends(get_db)):
+    txn = db.query(Transactions).filter(Transactions.id == entry_id).first()
+
+    if not txn:
+        return {"error": "Entry not found"}
+    txn.name = updated_entry.name
+    txn.description = updated_entry.description
+    txn.amount = updated_entry.amount
+    txn.date = updated_entry.date
+    txn.category = updated_entry.category
+
+    db.commit()
+    db.refresh(txn)
+
+    return txn
 
 
 @app.delete("/delete/{entry_id}")
