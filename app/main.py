@@ -3,11 +3,14 @@ from sqlalchemy.orm import Session
 from datetime import date
 from app.schemas import LedgerEntry
 from app.models import Transactions
-from app.database import get_db
+from app.database import get_db, Base, engine
 from app import models
 
 
 app=FastAPI()
+
+Base.metadata.create_all(bind=engine)
+
 
 @app.get("/")
 def home():
