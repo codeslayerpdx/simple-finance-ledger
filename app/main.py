@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from datetime import date
-from app.schemas import LedgerEntry
+from app.schemas import LedgerEntry,LedgerEntryout
 from app.models import Transactions
 from app.database import get_db, Base, engine
 from app import models
+from typing import List
 
 
 app=FastAPI()
@@ -16,7 +17,7 @@ Base.metadata.create_all(bind=engine)
 def home():
     return{"message":"Finance ledger API is running"}
 
-@app.post("/add")
+@app.post("/add",response_model=dict)
 def add_entry(entry: LedgerEntry, db: Session = Depends(get_db)) -> dict:
     new_txn = Transactions(
         name=entry.name,
@@ -31,11 +32,11 @@ def add_entry(entry: LedgerEntry, db: Session = Depends(get_db)) -> dict:
 
     return {"message": "Entry added successfully", "id": new_txn.id}
 
-@app.get("/entries")
+@app.get("/entries",response_model=List[LedgerEntryout])
 def get_all_entries(db: Session = Depends(get_db)):
     return db.query(Transactions).all()
 
-@app.put("/entries/{entry_id}")
+@app.put("/entries/{entry_id}",response_model=LedgerEntryout)
 def update_entry(entry_id: int, updated_entry: LedgerEntry, db: Session = Depends(get_db)):
     txn = db.query(Transactions).filter(Transactions.id == entry_id).first()
 
@@ -53,7 +54,7 @@ def update_entry(entry_id: int, updated_entry: LedgerEntry, db: Session = Depend
     return txn
 
 
-@app.delete("/entries/{entry_id}")
+@app.delete("/entries/{entry_id}", response_model=dict)
 def delete_entry(entry_id: int, db: Session = Depends(get_db)):
     txn = db.query(Transactions).filter(Transactions.id == entry_id).first()
     if not txn:
