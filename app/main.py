@@ -28,9 +28,9 @@ def add_entry(entry: LedgerEntry, db: Session = Depends(get_db)) -> dict:
 
     return {"message": "Entry added successfully", "id": new_txn.id}
 
-@app.get("/read")
-def get_all_entries():
-    return ledger
+@app.get("/entries")
+def get_all_entries(db: Session = Depends(get_db)):
+    return db.query(Transactions).all()
 
 @app.put("/update/{entry_id}")
 def update_entry(entry_id:int,updated_entry:LedgerEntry):
