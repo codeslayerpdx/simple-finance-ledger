@@ -50,10 +50,11 @@ def update_entry(entry_id: int, updated_entry: LedgerEntry, db: Session = Depend
     return txn
 
 
-@app.delete("/delete/{entry_id}")
-def delete_entry(entry_id:int):
-    for index,entry in enumerate(ledger):
-        if entry.id==entry_id:
-            ledger.pop(index)
-            return{"message":"entry deleted successfully"}
-    return{"error":"entry not found"}
+@app.delete("/entries/{entry_id}")
+def delete_entry(entry_id: int, db: Session = Depends(get_db)):
+    txn = db.query(Transactions).filter(Transactions.id == entry_id).first()
+    if not txn:
+        return {"error": "Entry not found"}
+    db.delete(txn)
+    db.commit()
+    return {"message": "Entry deleted successfully"}
